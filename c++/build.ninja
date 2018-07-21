@@ -1,0 +1,42 @@
+warnings = -Wall -Wextra -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict -Wnull-dereference -Wold-style-cast -Wuseless-cast -Wdouble-promotion -Wshadow -Wformat=2
+
+checks = -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined
+
+fast = -ffast-math -funsafe-math-optimizations -fomit-frame-pointer -funroll-loops
+simd = -mfma -mavx -mavx2 -msse4.2 -mno-vzeroupper
+#vec = -ftree-vectorize -fopt-info-vec-loop -ftree-vectorizer-verbose=2
+vec = -ftree-vectorize
+
+#cflags = -std=c++17 $warnings $math $checks -g
+cflags = -std=c++17 $warnings $fast $simd $vec
+
+rule c
+    depfile = build/$out.d
+    command = g++ -MMD -MF build/$out.d $cflags $flags -o $out $in
+
+rule s
+    depfile = build/$out.d
+    command = g++ -S -MMD -MF build/$out.d $cflags -o $out $in
+
+rule mkdir
+    command = mkdir -p $out
+
+build build/build: mkdir
+build build/bin: mkdir
+
+build bin/ff2jchz: c ff2jchz.cpp ff.cpp | jabz.hpp build/bin
+    flags=-lm
+
+build bin/ff2jabz: c ff2jabz.cpp ff.cpp | jabz.hpp build/bin
+    flags=-lm
+
+build bin/jchz2ff: c jchz2ff.cpp ff.cpp | jabz.hpp build/bin
+    flags=-lm
+
+build bin/jchz2ff-approx: c jchz2ff-approx.cpp ff.cpp | jabz.hpp build/bin
+    flags=-lm
+
+build bin/jabz2ff: c jabz2ff.cpp ff.cpp | jabz.hpp build/bin
+    flags=-lm
+
+build build/jabz2ff.s: s jabz2ff.cpp | jabz.hpp build/build

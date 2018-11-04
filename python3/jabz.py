@@ -242,8 +242,6 @@ class JzAzBz(typing.NamedTuple):
             x_ = 0
             y_ = 0
             z_ = 0
-
-        print(f'xyz_: {x_} {y_} {z_}')
         
         z = z_
         x = (x_ + (b-1)*z)/b
